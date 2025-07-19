@@ -1,0 +1,150 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: gp2p_postgres
+    environment:
+      POSTGRES_DB: getpaidtoplay
+      POSTGRES_USER: gp2p_user
+      POSTGRES_PASSWORD: gp2p_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - gp2p_network
+    restart: unless-stopped
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: gp2p_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - gp2p_network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gp2p_backend
+    environment:
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://gp2p_user:gp2p_password@postgres:5432/getpaidtoplay
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./backend:/app
+      - /app/venv
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - gp2p_network
+    restart: unless-stopped
+    command: python run.py
+
+  # Frontend Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: gp2p_frontend
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000/api/v1
+      - REACT_APP_WS_URL=ws://localhost:5000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - gp2p_network
+    restart: unless-stopped
+    command: npm start
+
+  # Nginx Reverse Proxy (for production)
+  nginx:
+    image: nginx:alpine
+    container_name: gp2p_nginx
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
+      - ./frontend/build:/usr/share/nginx/html
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - gp2p_network
+    restart: unless-stopped
+    profiles:
+      - production
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  gp2p_network:
+    driver: bridge
+
+# Development override
+# Use: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+---
+# docker-compose.dev.yml
+version: '3.8'
+
+services:
+  backend:
+    environment:
+      - FLASK_DEBUG=True
+      - FLASK_ENV=development
+    volumes:
+      - ./backend:/app
+    command: flask run --host=0.0.0.0 --port=5000 --reload
+
+  frontend:
+    environment:
+      - REACT_APP_DEBUG=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm start
+
+# Production override
+# Use: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+---
+# docker-compose.prod.yml
+version: '3.8'
+
+services:
+  backend:
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=False
+    command: gunicorn -w 4 -b 0.0.0.0:5000 run:app
+
+  frontend:
+    build:
+      target: production
+    command: serve -s build -l 3000
+
+  nginx:
+    profiles: []  # Enable nginx in production
+
