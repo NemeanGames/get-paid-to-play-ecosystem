@@ -154,6 +154,7 @@ get-paid-to-play-ecosystem/
 ### Setup Guides
 - [Frontend Setup](docs/frontend-setup.md) - React.js application setup
 - [Backend Setup](docs/backend-setup.md) - Flask API setup and configuration
+- [Stripe Integration](docs/stripe-integration.md) - Complete payment processing setup and integration
 
 ### Game Development
 - **Web Games**: HTML5/JavaScript with Phaser.js, Three.js, PixiJS
