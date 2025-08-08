@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fae Arcade Prototype</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .hotspot {
+            position: absolute;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Background image for the home screen -->
+        <img src="assets/home.png" alt="Home Screen" />
+        <!-- Play button hotspot -->
+        <a class="hotspot" href="https://tqkqkbpq.manus.space" title="Play"
+           style="left: 35%; top: 52%; width: 30%; height: 15%;"></a>
+        <!-- Compete button hotspot -->
+        <a class="hotspot" href="risk.html" title="Compete"
+           style="left: 20%; top: 70%; width: 60%; height: 8%;"></a>
+        <!-- Leaderboard button hotspot -->
+        <a class="hotspot" href="leaderboard.html" title="Leaderboard"
+           style="left: 20%; top: 79%; width: 60%; height: 8%;"></a>
+    </div>
+</body>
+</html>
