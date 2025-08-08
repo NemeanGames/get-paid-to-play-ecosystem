@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Profile</title>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.hotspot {
+  position: absolute;
+  display: block;
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <img src="assets/profile.png" alt="Profile Screen"/>
+    <!-- Back button -->
+    <a class="hotspot" href="index.html" title="Back" style="left: 5%; top: 90%; width: 20%; height: 6%;"></a>
+    <!-- Play button -->
+    <a class="hotspot" href="https://tqkqkbpq.manus.space" title="Play" style="left: 60%; top: 90%; width: 25%; height: 6%;"></a>
+    <!-- Leader board button -->
+    <a class="hotspot" href="leaderboard.html" title="Leader board" style="left: 35%; top: 74%; width: 30%; height: 6%;"></a>
+  </div>
+</body>
+</html>
